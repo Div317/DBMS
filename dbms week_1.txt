@@ -19,7 +19,7 @@ desc car;
 create table accident(
 report_num int,
 accident_date date,
-loaction varchar(20),
+location varchar(20),
 PRIMARY KEY(report_num)
 );
 desc accident;
