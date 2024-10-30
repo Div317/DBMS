@@ -1,0 +1,136 @@
+create database divya96;
+use divya96;
+create table branch(
+branchname varchar(20),
+branchcity varchar(20),
+assests float,
+primary key (branchname)
+);
+desc branch;
+
+create table bankaccount(
+accnum int,
+branchname varchar(20),
+balance float,
+primary key (accnum),
+foreign key(branchname) references branch(branchname)
+);
+desc bankaccount;
+
+create table bankcustomer(
+customername varchar(20),
+customerstreet varchar(20),
+customercity varchar(20),
+primary key(customername)
+);
+desc bankcustomer;
+
+create table depositer(
+customername varchar(20),
+accnum int,
+primary key(customername,accnum),
+foreign key(customername) references bankcustomer(customername),
+foreign key(accnum) references bankaccount(accnum)
+);
+desc depositer;
+
+create table loan(
+loanno int,
+branchname varchar(20),
+amount float,
+primary key (loanno),
+foreign key(branchname) references branch(branchname)
+);
+desc loan;
+
+insert into branch VALUES("SBI_Chamrajpet","Banglore",50000);
+insert into branch VALUES("SBI_ResidencyRoad","Banglore",10000);
+insert into branch VALUES("SBI_ShivajiRoad","Bombay",20000);
+insert into branch VALUES("SBI_ParlimentRoad","Delhi",10000);
+insert into branch VALUES("SBI_Jantarmantar","Delhi",20000);
+select * from branch;
+
+insert into bankaccount VALUES(1,"SBI_Chamrajpet",2000);
+insert into bankaccount VALUES(2,"SBI_ResidencyRoad",5000);
+insert into bankaccount VALUES(3,"SBI_ShivajiRoad",6000);
+insert into bankaccount VALUES(4,"SBI_ParlimentRoad",9000);
+insert into bankaccount VALUES(5,"SBI_Jantarmantar",8000);
+insert into bankaccount VALUES(6,"SBI_ShivajiRoad",4000);
+insert into bankaccount VALUES(8,"SBI_ResidencyRoad",4000);
+insert into bankaccount VALUES(9,"SBI_ParlimentRoad",3000);
+insert into bankaccount VALUES(10,"SBI_ResidencyRoad",5000);
+insert into bankaccount VALUES(11,"SBI_Jantarmantar",2000);
+select * from bankaccount;
+
+insert into bankcustomer VALUES("Avinash","Bull_Temple_road","Banglore");
+insert into bankcustomer VALUES("Dinesh","Bannergatta_road","Banglore");
+insert into bankcustomer VALUES("Mohan","NationalCollege_road","Banglore");
+insert into bankcustomer VALUES("Nikil","Akbar_road","Delhi");
+insert into bankcustomer VALUES("Ravi","Prithviraj_road","Delhi");
+select * from bankcustomer;
+
+insert into depositer VALUES("Avinash",1);
+insert into depositer VALUES("Dinesh",2);
+insert into depositer VALUES("Nikil",4);
+insert into depositer VALUES("Ravi",5);
+insert into depositer VALUES("Avinash",8);
+insert into depositer VALUES("Nikil",9);
+insert into depositer VALUES("Dinesh",10);
+insert into depositer VALUES("Nikil",11);
+select * from depositer;
+
+insert into loan VALUES(1,"SBI_Chamrajpet",1000);
+insert into loan VALUES(2,"SBI_ResidencyRoad",2000);
+insert into loan VALUES(3,"SBI_ShivajiRoad",3000);
+insert into loan VALUES(4,"SBI_ParlimentRoad",4000);
+insert into loan VALUES(5,"SBI_Jantarmantar",5000);
+select * from loan;
+
+SELECT branchname, assests / 100000 AS "Assestsinlakhs"
+FROM branch;
+
+select d.customername
+from depositer d, bankaccount b
+where b.branchname="SBI_ResidencyRoad"
+and d.accnum=b.accnum
+group by d.customername
+having count(b.accnum)>=2;
+
+select branchname, sum(assests) as totalassests
+from branch
+group by branchname;
+
+SELECT customername, customercity 
+FROM bankcustomer 
+WHERE customercity = 'Banglore';
+
+select customername, accnum
+from depositer;
+
+SELECT DISTINCT d.customername, bc.customercity
+FROM depositer d, bankcustomer bc
+where d.customername=bc.customername and bc.customercity = 'delhi'
+GROUP BY d.customername;
+
+SELECT DISTINCT d.customername, ba.balance
+FROM  depositer d, bankaccount ba
+where d.accnum = ba.accnum
+having ba.balance > 100000;
+
+SELECT DISTINCT d.customername
+FROM depositer d, bankaccount ba, loan l
+where d.accnum=ba.accnum and l.branchname=ba.branchname;
+
+select branchname, count(accnum)
+from bankaccount
+group by branchname;
+ 
+select branchname, count(loanno)
+from loan 
+group by branchname
+order by sum(amount) asc limit 1;
+
+select b.branchname
+from branch b
+left join loan l on b.branchname = l.branchname
+where l.branchname is null;
