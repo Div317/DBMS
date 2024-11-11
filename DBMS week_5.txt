@@ -1,0 +1,100 @@
+create database divyaa_96;
+use divyaa_96;
+
+create table dept(
+deptno int,
+dname varchar(20),
+dloc varchar(20),
+PRIMARY KEY(deptno)
+);
+
+create table employee(
+empno int,
+ename varchar(20),
+mgr_no int,
+hiredate varchar(20),
+sal float,
+deptno int,
+PRIMARY KEY(empno),
+FOREIGN KEY(deptno) references dept(deptno)
+);
+
+create table incentives(
+empno int,
+incentive_date varchar(20),
+incentive_amount int,
+PRIMARY KEY(empno,incentive_date),
+FOREIGN KEY(empno) references employee(empno)
+);
+
+create table project(
+pno int,
+ploc varchar(20),
+pname varchar(20),
+PRIMARY KEY(pno)
+);
+
+create table assignedto(
+pno int,
+empno int,
+job_role varchar(20),
+PRIMARY KEY(pno,empno),
+FOREIGN KEY(empno) references employee(empno),
+FOREIGN KEY(pno) references project(pno)
+);
+
+insert into dept(deptno,dname,dloc) VALUES
+(1,'sales','bengaluru'),
+(2,'HR','hyderabad'),
+(3,'IT','mysuru'),
+(4,'finance','chennai'),
+(5,'marketing','mumbai');
+select * from dept;
+
+insert into employee(empno,ename,mgr_no,hiredate,sal,deptno) VALUES
+(101,'Alice',201,'04-04-21',50000,1),
+(102,'Bob',202,'15-05-22',60000,3),
+(103,'Charlie',203,'16-06-25',70000,4),
+(104,'Eve',204,'19-07-29',80000,6),
+(105,'Martin',205,'18-10-21',10000,7);
+select * from employee;
+
+insert into incentives(empno,incentive_date,incentive_amount) VALUES
+(101,'16-05-26',5000),
+(103,'15-04-25',2000),
+(102,'16-01-15',5000),
+(105,'19-05-20',2000),
+(106,'19,06-22',1000);
+select * from incentives;
+
+insert into project(pno,ploc,pname) VALUES
+(1001,'bengaluru','FWD'),
+(1002,'hyderabad','USP'),
+(1003,'mysuru','PHD'),
+(1004,'pune','FDW'),
+(1005,'chennai','USP');
+select * from project;
+
+insert into assignedto(empno,pno,job_role) VALUES
+(1004,103,'manager'),
+(1005,102,'HR'),
+(1001,104,'HR'),
+(1003,105,'manager'),
+(1002,101,'employee');
+select * from assignedto;
+
+select empno
+from assignedto a
+join project p ON a.pno = p.pno
+where p.ploc IN('bengaluru','hyderabad','mysuru');
+
+select empno
+from employee
+where empno NOT IN(select empno from incentives);
+
+select e.ename,e.empno,d.dname,a.job_role,d.dloc,p.ploc
+from employee e, dept d, project p, assignedto a
+where e.empno = a.empno and
+e.deptno = d.deptno and
+a.pno = p.pno and
+d.dloc = p.ploc;
